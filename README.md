@@ -28,7 +28,7 @@ This pipeline is designed with modularity and reproducibility in mind, allowing 
 
 ### Tools
 
-- [Git] https://git-scm.com/
+- https://git-scm.com/
 - FastQC
 - Samtools
 - Picard
