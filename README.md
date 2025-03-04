@@ -28,11 +28,11 @@ This pipeline is designed with modularity and reproducibility in mind, allowing 
 
 ### Tools
 
-- https://git-scm.com/
-- FastQC
-- Samtools
-- Picard
-- GATK or FreeBayes
+- [Git](https://git-scm.com/)
+- [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
+- [Samtools](http://www.htslib.org/)
+- [Picard](https://broadinstitute.github.io/picard/)
+- [GATK](https://gatk.broadinstitute.org/hc/en-us) or [FreeBayes](https://github.com/freebayes/freebayes)
 
 ## Installation
 
