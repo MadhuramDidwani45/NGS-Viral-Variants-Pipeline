@@ -111,23 +111,42 @@ The pipeline currently processes SRR33784444 with reference NC_001802.1. To anal
 ## Pipeline Workflow
 
 ```mermaid
-graph TD
-    A[Download Reference Genome] --> B[Download SRA Data]
-    B --> C[Convert SRA to FASTQ]
-    C --> D[Quality Control - FastQC]
-    D --> E[Trim Reads - Trimmomatic]
-    E --> F[Quality Control - FastQC Trimmed]
-    F --> G[Build BWA Index]
-    G --> H[Align Reads - BWA-MEM]
-    H --> I[Convert SAM to BAM]
-    I --> J[Sort and Index BAM]
-    J --> K[Mark Duplicates - GATK]
-    K --> L[Add Read Groups - GATK]
-    L --> M[Call Variants - HaplotypeCaller]
-    M --> N[Filter Variants - VariantFiltration]
-    N --> O[Select High-Confidence Variants]
-    O --> P[Generate Consensus Sequence]
-    P --> Q[Create Summary Report]
+flowchart LR
+    A[📥 Data Input] --> B[🔧 Preprocessing]
+    B --> C[🧬 Alignment]
+    C --> D[📊 Variant Calling]
+    D --> E[📋 Results]
+    
+    subgraph " "
+        A1[Reference Genome<br/>SRA Data] 
+        A --> A1
+    end
+    
+    subgraph " "
+        B1[Quality Control<br/>Read Trimming<br/>FastQC Reports]
+        B --> B1
+    end
+    
+    subgraph " "
+        C1[BWA-MEM Alignment<br/>BAM Processing<br/>Duplicate Removal]
+        C --> C1
+    end
+    
+    subgraph " "
+        D1[GATK HaplotypeCaller<br/>Variant Filtering<br/>Quality Assessment]
+        D --> D1
+    end
+    
+    subgraph " "
+        E1[VCF Files<br/>Consensus Sequence<br/>Coverage Statistics<br/>Summary Report]
+        E --> E1
+    end
+    
+    style A fill:#e1f5fe
+    style B fill:#f3e5f5
+    style C fill:#e8f5e8
+    style D fill:#fff3e0
+    style E fill:#ffebee
 ```
 
 ## Output Files
@@ -194,6 +213,14 @@ Check `variant_calling.log` for detailed execution logs with timestamps. This fi
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Citation
+
+If you use this pipeline in your research, please cite the relevant tools:
+
+- **BWA**: Li H. and Durbin R. (2009) Fast and accurate short read alignment with Burrows-Wheeler Transform. Bioinformatics, 25:1754-60.
+- **GATK**: McKenna A, et al. (2010) The Genome Analysis Toolkit: a MapReduce framework for analyzing next-generation DNA sequencing data. Genome Research, 20:1297-303.
+- **SAMtools**: Li H., et al. (2009) The Sequence Alignment/Map format and SAMtools. Bioinformatics, 25:2078-9.
 
 ## Support
 
