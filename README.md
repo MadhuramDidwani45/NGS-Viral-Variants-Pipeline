@@ -8,7 +8,7 @@ This pipeline processes paired-end Illumina sequencing data to identify variants
 
 ## Features
 
-- **Automated reference genome download** from NCBI
+- **Annotated reference genome download** from NCBI
 - **Quality control** with FastQC (before and after trimming)
 - **Read trimming** with Trimmomatic
 - **BWA-MEM alignment** optimized for viral sequences
@@ -17,6 +17,48 @@ This pipeline processes paired-end Illumina sequencing data to identify variants
 - **Consensus sequence generation**
 - **Coverage analysis and statistics**
 - **Comprehensive logging** with timestamps
+
+  
+## Pipeline Workflow
+
+```mermaid
+flowchart LR
+    A[📥 Data Input] --> B[🔧 Preprocessing]
+    B --> C[🧬 Alignment]
+    C --> D[📊 Variant Calling]
+    D --> E[📋 Results]
+    
+    subgraph " "
+        A1[Reference Genome<br/>SRA Data] 
+        A --> A1
+    end
+    
+    subgraph " "
+        B1[Quality Control<br/>Read Trimming<br/>FastQC Reports]
+        B --> B1
+    end
+    
+    subgraph " "
+        C1[BWA-MEM Alignment<br/>BAM Processing<br/>Duplicate Removal]
+        C --> C1
+    end
+    
+    subgraph " "
+        D1[GATK HaplotypeCaller<br/>Variant Filtering<br/>Quality Assessment]
+        D --> D1
+    end
+    
+    subgraph " "
+        E1[VCF Files<br/>Consensus Sequence<br/>Coverage Statistics<br/>Summary Report]
+        E --> E1
+    end
+    
+    style A fill:#e1f5fe
+    style B fill:#f3e5f5
+    style C fill:#e8f5e8
+    style D fill:#fff3e0
+    style E fill:#ffebee
+```
 
 ## Prerequisites
 
@@ -108,46 +150,6 @@ The pipeline currently processes SRR33784444 with reference NC_001802.1. To anal
    - **Quality thresholds**: Adjust GATK filtering parameters
    - **Trimming settings**: Modify Trimmomatic parameters
 
-## Pipeline Workflow
-
-```mermaid
-flowchart LR
-    A[📥 Data Input] --> B[🔧 Preprocessing]
-    B --> C[🧬 Alignment]
-    C --> D[📊 Variant Calling]
-    D --> E[📋 Results]
-    
-    subgraph " "
-        A1[Reference Genome<br/>SRA Data] 
-        A --> A1
-    end
-    
-    subgraph " "
-        B1[Quality Control<br/>Read Trimming<br/>FastQC Reports]
-        B --> B1
-    end
-    
-    subgraph " "
-        C1[BWA-MEM Alignment<br/>BAM Processing<br/>Duplicate Removal]
-        C --> C1
-    end
-    
-    subgraph " "
-        D1[GATK HaplotypeCaller<br/>Variant Filtering<br/>Quality Assessment]
-        D --> D1
-    end
-    
-    subgraph " "
-        E1[VCF Files<br/>Consensus Sequence<br/>Coverage Statistics<br/>Summary Report]
-        E --> E1
-    end
-    
-    style A fill:#e1f5fe
-    style B fill:#f3e5f5
-    style C fill:#e8f5e8
-    style D fill:#fff3e0
-    style E fill:#ffebee
-```
 
 ## Output Files
 
