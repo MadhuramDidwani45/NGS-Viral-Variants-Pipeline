@@ -1,44 +1,210 @@
-# NGS Variant Calling Pipeline
+# Viral Variant Calling Pipeline
 
-A comprehensive, modular pipeline for calling variants from next-generation sequencing (NGS) data. This pipeline streamlines the analysis from raw sequencing reads to annotated variant calls, making it easier to integrate into your bioinformatics workflows.
+A comprehensive bioinformatics pipeline for calling variants in viral genomes using BWA-MEM alignment and GATK variant calling tools. This pipeline is optimized for viral sequences and includes quality control, trimming, alignment, variant calling, and consensus sequence generation.
 
 ## Overview
 
-The NGS Variant Calling Pipeline automates the key steps in variant analysis, including:
-
-- **Quality Control:** Assessing raw read quality (e.g., using FastQC).
-- **Read Alignment:** Mapping reads to a reference genome (e.g., using BWA or Bowtie).
-- **Post-processing:** Sorting, indexing, and marking duplicates (e.g., with Samtools and Picard).
-- **Variant Calling:** Identifying single nucleotide variants and indels (e.g., using GATK or FreeBayes).
-- **Annotation:** Adding biological context to identified variants (e.g., using GATK).
-
-This pipeline is designed with modularity and reproducibility in mind, allowing you to easily customize and extend its functionality.
+This pipeline processes paired-end Illumina sequencing data to identify variants in viral genomes. It downloads reference genomes from NCBI, performs quality control and trimming, aligns reads using BWA-MEM, and calls variants using GATK with viral-specific parameters.
 
 ## Features
 
-- **Modular Design:** Easily swap out or add tools based on your analysis needs.
-- **Automation:** Provides end-to-end processing from raw data to annotated variant reports.
-- **Scalability:** Suitable for both small-scale projects and large-scale studies.
-- **Reproducibility:** Uses configuration files and version control to ensure that analyses can be replicated.
+- **Automated reference genome download** from NCBI
+- **Quality control** with FastQC (before and after trimming)
+- **Read trimming** with Trimmomatic
+- **BWA-MEM alignment** optimized for viral sequences
+- **GATK variant calling** with viral-specific parameters
+- **Variant filtering** and quality assessment
+- **Consensus sequence generation**
+- **Coverage analysis and statistics**
+- **Comprehensive logging** with timestamps
 
-## Requirements
+## Prerequisites
 
-- **Operating System:** Linux-based systems (tested on Ubuntu)
-- **Programming Language:** Python 3.6 or higher
+### Required Tools
 
-### Tools
+Make sure the following tools are installed and available in your PATH:
 
-- [Git](https://git-scm.com/)
-- [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
-- [Samtools](http://www.htslib.org/)
-- [Picard](https://broadinstitute.github.io/picard/)
-- [GATK](https://gatk.broadinstitute.org/hc/en-us) or [FreeBayes](https://github.com/freebayes/freebayes)
+| Tool | Version | Purpose | Installation Link |
+|------|---------|---------|-------------------|
+| [BWA](https://github.com/lh3/bwa) | ≥0.7.17 | Read alignment | [GitHub](https://github.com/lh3/bwa) |
+| [SAMtools](https://www.htslib.org/) | ≥1.10 | SAM/BAM processing | [Website](https://www.htslib.org/) |
+| [GATK](https://gatk.broadinstitute.org/) | ≥4.2 | Variant calling | [Broad Institute](https://gatk.broadinstitute.org/) |
+| [BCFtools](https://www.htslib.org/) | ≥1.10 | VCF processing | [Website](https://www.htslib.org/) |
+| [Trimmomatic](http://www.usadellab.org/cms/?page=trimmomatic) | ≥0.39 | Read trimming | [Website](http://www.usadellab.org/cms/?page=trimmomatic) |
+| [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) | ≥0.11 | Quality control | [Website](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) |
+| [SRA Toolkit](https://github.com/ncbi/sra-tools) | ≥2.10 | SRA data download | [GitHub](https://github.com/ncbi/sra-tools) |
+
+### System Requirements
+
+- **Operating System**: Linux/Unix (tested on Ubuntu 18.04+)
+- **Memory**: Minimum 8GB RAM (16GB recommended)
+- **Storage**: At least 10GB free space for intermediate files
+- **CPU**: Multi-core processor recommended (pipeline uses 4 threads by default)
 
 ## Installation
 
-Clone the repository:
+### Using Conda (Recommended)
 
 ```bash
-git clone https://github.com/MadhuramDidwani45/NGS-Pipeline.git
-cd ngs
+# Create a new conda environment
+conda create -n viral-variants python=3.8
+
+# Activate the environment
+conda activate viral-variants
+
+# Install required tools
+conda install -c bioconda bwa samtools gatk4 bcftools trimmomatic fastqc sra-tools
+
+# Install additional dependencies
+conda install -c conda-forge wget
 ```
+
+### Manual Installation
+
+Alternatively, install each tool manually following the links provided in the prerequisites table.
+
+## Usage
+
+### Basic Usage
+
+1. **Clone this repository:**
+   ```bash
+   git clone https://github.com/MadhuramDidwani45/NGS-Pipeline.git
+   cd viral-variant-calling
+   ```
+
+2. **Make the script executable:**
+   ```bash
+   chmod +x variant_calling_pipeline.sh
+   ```
+
+3. **Run the pipeline:**
+   ```bash
+   ./variant_calling_pipeline.sh
+   ```
+
+### Customization
+
+The pipeline currently processes SRR33784444 with reference NC_001802.1. To analyze different data:
+
+1. **Modify the SRA accession number:**
+   ```bash
+   # Change this line in the script
+   prefetch SRR33784444 --progress
+   # To your desired SRA accession
+   prefetch YOUR_SRA_ID --progress
+   ```
+
+2. **Change the reference genome:**
+   ```bash
+   # Modify the reference URL
+   wget --quiet --show-progress \
+        --output-document=reference.fa \
+        "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=YOUR_REFERENCE_ID&rettype=fasta"
+   ```
+
+3. **Adjust parameters:**
+   - **Thread count**: Modify `-t 4` in BWA-MEM command
+   - **Quality thresholds**: Adjust GATK filtering parameters
+   - **Trimming settings**: Modify Trimmomatic parameters
+
+## Pipeline Workflow
+
+```mermaid
+graph TD
+    A[Download Reference Genome] --> B[Download SRA Data]
+    B --> C[Convert SRA to FASTQ]
+    C --> D[Quality Control - FastQC]
+    D --> E[Trim Reads - Trimmomatic]
+    E --> F[Quality Control - FastQC Trimmed]
+    F --> G[Build BWA Index]
+    G --> H[Align Reads - BWA-MEM]
+    H --> I[Convert SAM to BAM]
+    I --> J[Sort and Index BAM]
+    J --> K[Mark Duplicates - GATK]
+    K --> L[Add Read Groups - GATK]
+    L --> M[Call Variants - HaplotypeCaller]
+    M --> N[Filter Variants - VariantFiltration]
+    N --> O[Select High-Confidence Variants]
+    O --> P[Generate Consensus Sequence]
+    P --> Q[Create Summary Report]
+```
+
+## Output Files
+
+| File | Description |
+|------|-------------|
+| `sorted.bam` | Aligned and sorted reads |
+| `unique_reads.bam` | Deduplicated reads with proper read groups |
+| `output.vcf` | Raw variant calls |
+| `filtered_output.vcf` | Filtered variants with quality annotations |
+| `high_confidence_variants.vcf` | High-confidence variants only |
+| `consensus_sequence.fa` | Consensus genome sequence |
+| `coverage_plot.txt` | Coverage data for visualization |
+| `pipeline_summary.txt` | Comprehensive pipeline summary |
+| `variant_calling.log` | Detailed pipeline log with timestamps |
+
+## Quality Control Parameters
+
+### Trimmomatic Settings
+- **ILLUMINACLIP**: TruSeq3-PE.fa:2:30:10
+- **SLIDINGWINDOW**: 4:20
+- **MINLEN**: 50
+
+### GATK Variant Calling
+- **Confidence threshold**: 10
+- **Minimum mapping quality**: 20
+- **Maximum reads per alignment start**: Unlimited
+
+### Variant Filtering Criteria
+- **QD** (Quality by Depth): ≥2.0
+- **FS** (Fisher Strand): ≤60.0
+- **MQ** (Mapping Quality): ≥30.0
+- **DP** (Read Depth): ≥10
+- **QUAL** (Variant Quality): ≥30.0
+
+## Troubleshooting
+
+### Common Issues
+
+1. **"Command not found" errors**: Ensure all tools are installed and in PATH
+2. **Memory errors**: Increase available RAM or reduce thread count
+3. **Network timeouts**: Check internet connection for reference download
+4. **Permission errors**: Ensure write permissions in working directory
+
+### Log Files
+
+Check `variant_calling.log` for detailed execution logs with timestamps. This file contains all stdout and stderr output from the pipeline.
+
+## Performance Optimization
+
+- **Increase threads**: Modify `-t 4` parameter for BWA-MEM and GATK
+- **Adjust memory**: Set GATK memory limits using `-Xmx` flags
+- **Parallel processing**: Run multiple samples simultaneously
+- **SSD storage**: Use fast storage for intermediate files
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Support
+
+For questions or issues:
+- Open an [issue](https://github.com/MadhuramDidwani45/NGS-Pipeline/issues) on GitHub
+- Check the [troubleshooting](#troubleshooting) section
+- Review tool-specific documentation linked above
+
+## Changelog
+
+### v1.0.0
+- Initial release with BWA-MEM alignment
+- GATK variant calling with viral-specific parameters
+- Comprehensive quality control and reporting
