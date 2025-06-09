@@ -69,7 +69,7 @@ Alternatively, install each tool manually following the links provided in the pr
 
 1. **Clone this repository:**
    ```bash
-   git clone https://github.com/MadhuramDidwani45/NGS-Pipeline.git
+   git clone https://github.com/MadhuramDidwani45/NGS-Viral-Variants-Pipeline.git
    cd viral-variant-calling
    ```
 
@@ -198,7 +198,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Support
 
 For questions or issues:
-- Open an [issue](https://github.com/MadhuramDidwani45/NGS-Pipeline/issues) on GitHub
+- Open an [issue](https://github.com/MadhuramDidwani45/NGS-Viral-Variants-Pipeline/issues) on GitHub
 - Check the [troubleshooting](#troubleshooting) section
 - Review tool-specific documentation linked above
 
