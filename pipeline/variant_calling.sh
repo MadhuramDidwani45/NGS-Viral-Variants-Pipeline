@@ -19,6 +19,8 @@ mkdir -p bam_files
 mkdir -p vcf_files
 mkdir -p reports
 mkdir -p raw_fastq
+mkdir -p Fastqc_results
+
 
 # Step 0.1: Download raw FASTQ files
 echo "Step 0.1: Downloading raw FASTQ files..."
@@ -27,8 +29,15 @@ for SAMPLE in "${SAMPLES[@]}"; do
     fastq-dump --split-files --gzip --outdir raw_fastq ${SAMPLE}
 done
 
-# Step 0.2: Quality trimming with Trimmomatic
-echo "Step 0.2: Trimming reads with Trimmomatic..."
+# Step 0.2: Quality Control FASTQC
+echo "Step 0.2: Quality COntrol with Fastqc..."
+for SAMPLE in "${SAMPLES[@]}"; do
+    echo "Fastqc ${SAMPLE}..."
+    fastqc ${SAMPLE} -o Fastqc_results/
+done
+
+# Step 0.3: Quality trimming with Trimmomatic
+echo "Step 0.3: Trimming reads with Trimmomatic..."
 for SAMPLE in "${SAMPLES[@]}"; do
     echo "  Trimming ${SAMPLE}..."
     trimmomatic PE -threads ${THREADS} \
